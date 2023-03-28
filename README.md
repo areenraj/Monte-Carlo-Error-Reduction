@@ -1,4 +1,4 @@
-# Monte-Carlo-Option
+# Monte-Carlo-Option-Pricing
 The code in this repo takes input of certain parameters associated with a particular option and simulates the expected payoff using the Monte Carlo Method. This payoff can be used to calculate the price of the option based on the no-arbitrage assumption. The code contains four functions:-
 
 - calcvol - This uses the mibian python library to calculate the implied volatility of the market after the user has given it the parameters of an option contract whose price is already known. Usually the input parameters are the values taken from a similar contract with a different strike price.
