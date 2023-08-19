@@ -27,6 +27,9 @@ The payoff can be used to calculate the price of the option based on the no-arbi
 * payoff - This caclulates the payoff the call option and also finds out the standard error associated with it. It returns the price of the contract and its standard error. The inputs are the simulation list and the results from the simulation function.
 * plotMCS - If required, the iterations can be plotted using this command. They are graphed against day-to-day progression to show how each spot prices fares as the time increases. The input for this function includes the simulation list and the results from the simulation function. 
 
+
+![Blank diagram](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/2cfd075b-7fa4-4663-91e4-4f5815f9f5f5)
+
 Each simulation is treated as a class defined by its input parameters and all the test cases have to be entered in a list which can then be passed to the functions. The use of numpy, matplotlib, datetime and mibian has been made. scipy has also been installed as a dependency for mibian. 
 
 ## Error Reduction
@@ -70,5 +73,36 @@ Using the stock price, we find that the value of c corresponds to the physical v
 
 The final equation to calculate the pay off is as follows
 ```math
-C_{initial} + \frac{\partial C}{\partial S}(S_{i+1}-E[S_i])
+C_{initial} + \Sigma \frac{\partial C}{\partial S}(S_{i+1}-E[S_i]) = C_{final}
 ```
+From the above equation we can calculate the initial value of the option price, the summation is over all iterations. 
+
+## Error-Reduction Compiled Results
+
+The simulaiton was run with 100 timesteps with 1000 possibilities per iteration. The test case was a call option of the Reliance group. 
+
+|  Method Used  |Absolute Standard Error  |Relative Standard Error  |
+|---------------|-------------------------|-------------------------|
+|Simple MCS     |         3.53243         |         3.62544%        |       
+|Anti-Thetic Var|         1.40395         |         1.42156%        |
+|Control Var    |         0.78059         |         0.80146%        |
+|ATV + Control  |         0.38696         |         0.39896%        |
+____________________________________________________________________
+
+![SIMPLE_MCS](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/21899bb7-8abd-437a-a9d6-90675834e722)
+![timestep](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/e361b3fc-bb69-411d-a7a2-a99c9808fedf)
+![Legend](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/f74a1de2-d4d7-41d9-9ec7-b6118cc5185b)
+
+## Error Rate Convergence
+
+Here we experiment with different number generators to see if the we can achieve a faster rate for convergence.
+
+The standard generator is that of numpy's Pseudo Random Number Generator (PNRG). There is another method that is more suited for Monte Carlo Simulations - Quasi Random Number Generators. These generators don't actually simulate random numbers, they are more deterministic in nature. The use of primitive polynomials that prevent both excessive clustering and gaps in the number space are used. For the case of Monte Carlo, this is beneficial. 
+
+The two Quasi Random Generators we use are from scipy's library - Halton and Sobol Distribution. The results for them are as follows
+
+![Pseudo](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/e9bb3dd3-e6d5-44af-9fef-8cfd2cb65c8d)
+![Halton](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/5be27db0-12de-41cd-b11a-2ea78b0e50b7)
+![Sobol](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/e3a653cd-47c1-46ea-910d-182ee4240454)
+</br>
+It can be clearly inferred that the Sobol generator converges faster. 
