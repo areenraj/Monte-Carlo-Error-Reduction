@@ -10,8 +10,8 @@ While technically this standard error is not exactly related to the accuracy of 
 
 The following project aims to achieve two things.
 
-1. Analysis the magnitude of standard error of the simulation and find approaches to decrease it.
-2. Improve the rate of convergence of the simulation.
+1. Analysis of the magnitude of standard error encountered in the simulation and investigating approaches to decrease it.
+2. Improving the rate of convergence of the standard error.
 
 ## Setup
 
@@ -23,18 +23,18 @@ The test case use to analyze the use of the simulation in a real world scenario 
 The payoff can be used to calculate the price of the option based on the no-arbitrage assumption. The code contains four functions:-
 
 * calcvol - This uses the mibian python library to calculate the implied volatility of the market after the user has given it the parameters of an option contract whose price is already known. Usually the input parameters are the values taken from a similar contract with a different strike price.
-* simulation - This function simulates the Geometric Brownian Motion of for a number of iterations i and time steps i_t. It returns the results in the form of an array containing all the spot prices for all time steps.
-* payoff - This caclulates the payoff the call option and also finds out the standard error associated with it. It returns the price of the contract and its standard error. The inputs are the simulation list and the results from the simulation function.
+* simulation - This function simulates the Geometric Brownian Motion of the stock price for a number of iterations i and time steps i_t. It returns the results in the form of an array containing all the spot prices for all time steps.
+* payoff - This caclulates the payoff of the call option and also finds out the standard error associated with it. It returns the price of the contract and its standard error. The inputs are the simulation list and the results from the simulation function.
 * plotMCS - If required, the iterations can be plotted using this command. They are graphed against day-to-day progression to show how each spot prices fares as the time increases. The input for this function includes the simulation list and the results from the simulation function. 
 
 
 ![Blank diagram](https://github.com/areenraj/Monte-Carlo-Error-Analysis/assets/80944803/2cfd075b-7fa4-4663-91e4-4f5815f9f5f5)
 
-Each simulation is treated as a class defined by its input parameters and all the test cases have to be entered in a list which can then be passed to the functions. The use of numpy, matplotlib, datetime and mibian has been made. scipy has also been installed as a dependency for mibian. 
+Each simulation is treated as a class defined by its input parameters and all the test cases have to be entered in a list which can then be passed to the functions. The use of numpy, matplotlib, datetime and mibian has been made. scipy has also been installed as a dependency for mibian and for the various number generators. 
 
 ## Error Reduction
 
-One way to reduce the error is to increase the number of possibilities being considered. This is a crude way to throw computational power at the problem. A more elegant approach is variance reduction through the use of certain techniques that help to reduce the variance of the entire simulation. We analyze three methods that could be used to accomplish the same
+One way to reduce the error is to increase the number of possibilities being considered. This is a crude way to throw computational power at the problem. A more elegant approach is that of variance reduction through the use of certain techniques that help to reduce the variance of the entire simulation. We analyze three methods that could be used to accomplish the same
 
 ### Anti-Thetic Variates
 This part is more along the lines of a statistical trick that employs the use of the total variance formula and the concept of the covariance between two variables. The total variance of a variable that is composed of two other variables is as follows
@@ -44,7 +44,7 @@ This part is more along the lines of a statistical trick that employs the use of
 ```math
 var(\theta) = \frac{var(N_1) + var(N_2) + cov(N_1,N_2)}{4}
 ```
-If the correlation between the two random variables is negative then it can lead to a total variance reduction. This is achieved through the help of taking the negative of the random variable we are simulating and taking the system through two oppositely mirrored states simulatneously. This allows for a perfectly negative correlation between the two variable and hence causes the variance and the standard error to drop. 
+If the correlation between the two random variables is negative then it can lead to a total variance reduction. This is achieved through the help of taking the negative of the random variable we are simulating and taking the system through two oppositely mirrored states simulaneously. This allows for a perfectly negative correlation between the two variables and hence causes the variance and the standard error to drop. 
 
 ### Control Variates
 This method employs the use of another random variable whose variance we can use to manipulate the total variance of the simulation. Let there be two random variables like follows
@@ -95,7 +95,7 @@ ____________________________________________________________________
 
 ## Error Rate Convergence
 
-Here we experiment with different number generators to see if the we can achieve a faster rate for convergence.
+Here we experiment with different number generators to see if we can achieve a faster rate for convergence.
 
 The standard generator is that of numpy's Pseudo Random Number Generator (PNRG). There is another method that is more suited for Monte Carlo Simulations - Quasi Random Number Generators. These generators don't actually simulate random numbers, they are more deterministic in nature. The use of primitive polynomials that prevent both excessive clustering and gaps in the number space are used. For the case of Monte Carlo, this is beneficial. 
 
