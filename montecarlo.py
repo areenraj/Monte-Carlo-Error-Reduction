@@ -35,9 +35,13 @@ def simulation(simlist,type):  #returns a results array which holds the spot pri
     resultsminus = [] 
     for sim in simlist:
         if type == 'Sobol':
+            k = np.round(np.log2(sim.i) + 1)
+            k = k.astype(int)
             sampler = stats.qmc.Sobol(d=sim.i_t+1, scramble = True)         #This if structure tree decides what random number generation to use
-            Z = sampler.random_base2(m=np.log2(sim.i))
+            Z = sampler.random_base2(m=k)
             Z = stats.norm.ppf(Z.T)
+            Z.resize((sim.i_t+1, sim.i))
+
             delt = sim.T/sim.i_t                                             #This specifies the matrix that contains all the random variables
             delx = (sim.rf - 0.5*sim.iv**2)*delt + sim.iv*np.sqrt(delt)*Z    #This calculates the incremental increase in the value of lnS or x
             delx[0] = 0
@@ -87,13 +91,15 @@ def simulation_delta_gamma(simlist,type):  #This is similar to the original simu
     controlminus = []
     for sim in simlist:
         if type == 'Sobol':
-            k = np.log2(sim.i)
+            k = np.round(np.log2(sim.i) + 1)
+            k = k.astype(int)
             delt = sim.T/sim.i_t
 
             sampler = stats.qmc.Sobol(d=sim.i_t+1, scramble=True)
-            Z = sampler.random_base2(m=tick)
+            Z = sampler.random_base2(m=k)
             Z =  stats.norm.ppf(Z.T)  
-            
+            Z.resize((sim.i_t+1, sim.i))
+
             delx = (sim.rf - 0.5*sim.iv**2)*delt + sim.iv*np.sqrt(delt)*Z   
             delx[0] = 0
             dely = (sim.rf - 0.5*sim.iv**2)*delt + sim.iv*np.sqrt(delt)*(-Z)  
@@ -106,13 +112,15 @@ def simulation_delta_gamma(simlist,type):  #This is similar to the original simu
             results.append(St)
             resultsminus.append(stminus)
 
-            d1 = ((np.log(St[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
+            with np.errstate(divide='ignore', invalid='ignore'): 
+                d1 = ((np.log(St[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
             delta1 = stats.norm.cdf(d1,0,1)
             delcv = delta1*(St[1:]-(St[:-1]*(2.7183**(sim.rf*delt))))
             cv = np.cumsum(delcv, axis=0)
             control.append(cv)
 
-            d1 = ((np.log(stminus[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
+            with np.errstate(divide='ignore', invalid='ignore'):
+                d1 = ((np.log(stminus[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
             delta1 = stats.norm.cdf(d1,0,1)
             delcv = delta1*(stminus[1:]-(stminus[:-1]*(2.7183**(sim.rf*delt))))
             cvminus = np.cumsum(delcv, axis=0)
@@ -137,13 +145,15 @@ def simulation_delta_gamma(simlist,type):  #This is similar to the original simu
             results.append(St)
             resultsminus.append(stminus)
 
-            d1 = ((np.log(St[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
+            with np.errstate(divide='ignore', invalid='ignore'): 
+                d1 = ((np.log(St[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
             delta1 = stats.norm.cdf(d1,0,1)
             delcv = delta1*(St[1:]-(St[:-1]*(2.7183**(sim.rf*delt))))
             cv = np.cumsum(delcv, axis=0)
             control.append(cv)
 
-            d1 = ((np.log(stminus[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
+            with np.errstate(divide='ignore', invalid='ignore'): 
+                d1 = ((np.log(stminus[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
             delta1 = stats.norm.cdf(d1,0,1)
             delcv = delta1*(stminus[1:]-(stminus[:-1]*(2.7183**(sim.rf*delt))))
             cvminus = np.cumsum(delcv, axis=0)
@@ -152,7 +162,7 @@ def simulation_delta_gamma(simlist,type):  #This is similar to the original simu
             delt = sim.T/sim.i_t
 
             Z = np.random.normal(size=(sim.i_t+1,sim.i))  
-            
+
             delx = (sim.rf - 0.5*sim.iv**2)*delt + sim.iv*np.sqrt(delt)*Z   
             delx[0] = 0
             dely = (sim.rf - 0.5*sim.iv**2)*delt + sim.iv*np.sqrt(delt)*(-Z)  
@@ -165,13 +175,15 @@ def simulation_delta_gamma(simlist,type):  #This is similar to the original simu
             results.append(St)
             resultsminus.append(stminus)
 
-
-            d1 = ((np.log(St[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
+            with np.errstate(divide='ignore', invalid='ignore'): 
+                d1 = ((np.log(St[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
             delta1 = stats.norm.cdf(d1,0,1)
             delcv = delta1*(St[1:]-(St[:-1]*(2.7183**(sim.rf*delt))))
             cv = np.cumsum(delcv, axis=0)
             control.append(cv)
-            d1 = ((np.log(stminus[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
+            
+            with np.errstate(divide='ignore', invalid='ignore'): 
+                d1 = ((np.log(stminus[:-1].T/sim.K) + (sim.rf + (sim.iv**2)/2)*np.linspace(sim.T,0,sim.i_t))/(sim.iv*np.linspace(sim.T,0,sim.i_t))).T
             delta1 = stats.norm.cdf(d1,0,1)
             delcv = delta1*(stminus[1:]-(stminus[:-1]*(2.7183**(sim.rf*delt))))
             cvminus = np.cumsum(delcv, axis=0)
@@ -254,15 +266,12 @@ def plotMCS(results, simlist):                   #Takes in the results that you 
 simtemp = Sim(855.4, 850, calcvol_delta(855.4,830,6.26,12,30.3,'call'), 0.0626, 100, 1000, (((dt.date(2023,8,31)-dt.date.today()).days + 1)/365.0))
 
 sims = [simtemp]
-    s
-S_t, S_tminus, control, controlminus = simulation_delta_gamma(sims,'PNRG')
+S_t, S_tminus, control, controlminus = simulation_delta_gamma(sims,'Sobol')
 
 price1, error1 = normal_payoff(S_t, sims)
 price2, error2 = atv_payoff(S_t, S_tminus, sims)
 price3, error3 = delta_gamma_payoff(S_t,control,sims)
 price4, error4 = atv_delta_gamma_payoff(S_t,S_tminus,control, controlminus, sims)
-
-print(calcvol_delta(855.4,830,6.26,12,30.3,'call'))
 
         
 print(price1,error1)    #Normal 
