@@ -1,4 +1,4 @@
-# Monte-Carlo-Error-Analysis
+# Monte-Carlo-Error-Reduction
 _This project was based on the information available in the book "Implementing Derivative Models" by Les Clewlow and Chris Strickland_
 ## Introduction
 The Monte Carlo Method is a simulation method of estimating the value of probabilistic quantities that may follow a stochastic equation. This estimation is done by iterating over several possible cases using random variables then averaging their values. This averaging method is at the core of Monte Carlo Simulations. The standard error of this process can be estimated as follows,
